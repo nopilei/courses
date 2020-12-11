@@ -28,24 +28,23 @@ class CourseViewSet(base_viewsets.ParentModelViewSet, mixins.CreateModelMixin):
     #  Lookup field for working with users
     user_lookup = 'pk'
 
-    @action(methods=['POST', 'DELETE'], detail=True, url_path='users')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='users',
+            permission_classes=[permissions.DeleteUserPermission])
     def process_user(self, *args, **kwargs):
         """
         Add new user to course or delete student
         """
-        course = self.get_object()
+        course = get_object_or_404(self.get_queryset(), pk=self.kwargs[self.lookup_field])
         #  Ensure that we've got proper user data
         filter_params = {self.user_lookup: self.request.data.get(self.user_lookup, -1)}
         user = get_object_or_404(models.User, **filter_params)
         if self.request.method == 'POST':
             models.Membership.objects.create(user=user, course=course)
             return Response(status=status.HTTP_200_OK)
-        elif user.is_student:
+        else:
+            self.check_object_permissions(self.request, user)
             models.Membership.objects.filter(user=user, course=course).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            #  Lecturer cannot delete another lecturer from the course
-            return Response(status=status.HTTP_403_FORBIDDEN)
 
     def get_queryset(self):
         return self.request.user.available_courses.all()

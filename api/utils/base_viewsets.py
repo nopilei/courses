@@ -58,7 +58,9 @@ class ParentModelViewSet(BaseModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_children(self):
-        #  Get all children
+        """
+        Get all children
+        """
         return getattr(self.get_object(), self.related_name).all()
 
     @classmethod
