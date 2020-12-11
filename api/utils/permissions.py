@@ -29,6 +29,8 @@ class IsLecturerOrStudentSafe(permissions.BasePermission):
             return is_lecturer or is_safe
 
 
+
+
 class FinishedTasksAccess(permissions.BasePermission):
     message = 'Only students can finish hometasks and only lecturers can set results'
 

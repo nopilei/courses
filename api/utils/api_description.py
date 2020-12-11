@@ -85,7 +85,7 @@ def courses_lectures_api_description(func):
             404: 'Could not list lectures of available course by id provided.'})(func)
 
     func = swagger_auto_schema(
-        operation_description="Add lecture to course.",
+        operation_description="Add lecture tourse.",
         method='post',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -93,12 +93,10 @@ def courses_lectures_api_description(func):
             properties={
                 'theme': openapi.Schema(type=openapi.TYPE_STRING,
                                         title='Theme'),
-                'course': openapi.Schema(type=openapi.TYPE_INTEGER,
-                                         title='Course'),
                 'presentation': openapi.Schema(type=openapi.TYPE_FILE,
                                                title='Presentation'),
             },
-            required=['theme', 'course']),
+            required=['theme']),
         responses={
             201: 'Added lecture to course.',
             403: 'You are not allowed to add lectures.',
@@ -120,7 +118,7 @@ def courses_users_api_description(func):
             required=['pk']
         ),
         responses={
-            201: 'Added user to course.',
+            200: 'Added user to course.',
             403: 'You are not allowed to add users to courses.',
             404: 'Could not add user to available course by id provided.'})(func)
 
@@ -137,7 +135,7 @@ def courses_users_api_description(func):
             required=['pk']
         ),
         responses={
-            201: 'Deleted student from course.',
+            204: 'Deleted student from course.',
             403: 'You are not allowed to delete this user.',
             404: 'Could not delete user from available course by id provided.'})(func)
     return func
@@ -197,8 +195,6 @@ def lectures_hometasks_api_description(func):
             properties={
                 'task': openapi.Schema(type=openapi.TYPE_STRING,
                                        title='Task'),
-                'lecture': openapi.Schema(type=openapi.TYPE_INTEGER,
-                                          title='Lecture'),
             },
             required=['task', 'lecture'],
         ),
@@ -270,8 +266,6 @@ def hometasks_finished_tasks_api_description(func):
             properties={
                 'answer': openapi.Schema(type=openapi.TYPE_STRING,
                                          title='Answer'),
-                'task': openapi.Schema(type=openapi.TYPE_INTEGER,
-                                       title='Hometask'),
             },
             required=['answer', 'task'],
         ),
@@ -311,6 +305,15 @@ def finished_task_api_description(model):
         klass = method_decorator(name='partial_update', decorator=swagger_auto_schema(
                                 operation_description="Update available finished task. "
                                                       "You can only set result as a lecturer",
+                                request_body=openapi.Schema(
+                                    type=openapi.TYPE_OBJECT,
+                                    title='FinishedTask',
+                                    properties={
+                                        'result': openapi.Schema(type=openapi.TYPE_INTEGER,
+                                                                 title='Result'),
+                                    },
+                                    required=['result'],
+                                ),
                                 responses={
                                     200: 'Result updated.',
                                     403: 'You are not allowed to modify finished tasks.',
@@ -345,8 +348,6 @@ def finished_tasks_comments_api_description(func):
             type=openapi.TYPE_OBJECT,
             title='Comment',
             properties={
-                'finished_task': openapi.Schema(type=openapi.TYPE_INTEGER,
-                                                title='Finished task'),
                 'comment': openapi.Schema(type=openapi.TYPE_STRING,
                                           title='Comment'),
             },
@@ -390,7 +391,7 @@ def comments_api_description(model):
                                     404: 'Could not update available comment by id provided.'})
                                  )(klass)
         klass = method_decorator(name='partial_update', decorator=swagger_auto_schema(
-                                operation_description="Update available hometask."
+                                operation_description="Update available comment."
                                                       " Only owner of the comment can modify it",
                                 responses={
                                     200: 'Comment updated.',
