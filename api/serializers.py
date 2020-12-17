@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.utils import IntegrityError
 from . import models
 
 
@@ -48,3 +49,16 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = models.User.objects.create_user(**validated_data)
         return user
+
+
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Membership
+        fields = ['id', 'user', 'course']
+
+    def create(self, validated_data):
+        try:
+            membership = super().create(validated_data)
+            return membership
+        except IntegrityError:
+            raise serializers.ValidationError('This user is already a member of this course')

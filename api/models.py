@@ -106,6 +106,7 @@ class Membership(models.Model):
     """
     course = models.ForeignKey(Course, verbose_name='Course', on_delete=models.CASCADE)
     user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)
+    joined = models.DateTimeField(auto_now_add=True, verbose_name='Date of entry')
 
     def __str__(self):
         return f'{self.user.username}:{self.course.title}'
@@ -113,6 +114,7 @@ class Membership(models.Model):
     class Meta:
         verbose_name = 'Course membership'
         verbose_name_plural = 'Course memberships'
+        constraints = [models.UniqueConstraint(fields=['course', 'user'], name='unique_course_user')]
 
 
 class Comment(models.Model):

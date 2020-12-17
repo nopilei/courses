@@ -263,7 +263,7 @@ class TestUsersCourses(CoursesTest):
         models.Membership.objects.create(user=cls.student_2, course=cls.test_course)
 
     def setUp(self):
-        self.url = reverse('courses-process-user', args=[self.test_course.pk])
+        self.url = reverse('courses-move-user', args=[self.test_course.pk])
 
     # =======================================================
     #                      POST
@@ -272,14 +272,19 @@ class TestUsersCourses(CoursesTest):
     def test_lecturer_member_can_add_lecturer_to_available_course(self):
         request = partial(self.client.post, self.url, {'pk': self.lecturer_2.pk}, format='json')
         response = auth_and_request(self.client, self.lecturer_1, request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(models.Membership.objects.filter(user=self.lecturer_2).exists())
 
     def test_lecturer_member_can_add_student_to_available_course(self):
         request = partial(self.client.post, self.url, {'pk': self.student_1.pk}, format='json')
         response = auth_and_request(self.client, self.lecturer_1, request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(models.Membership.objects.filter(user=self.student_1).exists())
+
+    def test_lecturer_member_cannot_add_user_to_available_course_twice(self):
+        request = partial(self.client.post, self.url, {'pk': self.lecturer_1.pk}, format='json')
+        response = auth_and_request(self.client, self.lecturer_1, request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_student_member_cannot_add_lecturer_to_available_course(self):
         request = partial(self.client.post, self.url, {'pk': self.lecturer_2.pk}, format='json')

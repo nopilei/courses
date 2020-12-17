@@ -29,11 +29,14 @@ class IsLecturerOrStudentSafe(permissions.BasePermission):
             return is_lecturer or is_safe
 
 
-class DeleteUserPermission(IsLecturerOrStudentSafe):
-    message = 'You cannot delete another lecturer'
+class MoveUserPermission(IsLecturerOrStudentSafe):
 
     def has_object_permission(self, request, view, user):
-        return not user.is_lecturer
+        if request.method == 'DELETE':
+            self.message = 'You cannot delete another lecturer'
+            return not user.is_lecturer
+        else:
+            return not request.user.is_student
 
 
 class FinishedTasksAccess(permissions.BasePermission):

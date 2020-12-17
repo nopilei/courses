@@ -71,7 +71,7 @@ def courses_api_description(model):
         klass.get_queryset = _suppress_swagger_attribute_error(klass.get_queryset, model)
         klass.process_child = _copy_func(klass.process_child)
         klass.process_child = courses_lectures_api_description(klass.process_child)
-        klass.process_user = courses_users_api_description(klass.process_user)
+        klass.move_user = courses_users_api_description(klass.move_user)
         return klass
     return decorator
 
@@ -118,8 +118,9 @@ def courses_users_api_description(func):
             required=['pk']
         ),
         responses={
-            200: 'Added user to course.',
+            201: 'Added user to course.',
             403: 'You are not allowed to add users to courses.',
+            400: 'User is already the member.',
             404: 'Could not add user to available course by id provided.'})(func)
 
     func = swagger_auto_schema(

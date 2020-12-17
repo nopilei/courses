@@ -29,8 +29,8 @@ class CourseViewSet(base_viewsets.ParentModelViewSet, mixins.CreateModelMixin):
     user_lookup = 'pk'
 
     @action(methods=['POST', 'DELETE'], detail=True, url_path='users',
-            permission_classes=[permissions.DeleteUserPermission])
-    def process_user(self, *args, **kwargs):
+            permission_classes=[permissions.MoveUserPermission])
+    def move_user(self, *args, **kwargs):
         """
         Add new user to course or delete student
         """
@@ -38,11 +38,14 @@ class CourseViewSet(base_viewsets.ParentModelViewSet, mixins.CreateModelMixin):
         #  Ensure that we've got proper user data
         filter_params = {self.user_lookup: self.request.data.get(self.user_lookup, -1)}
         user = get_object_or_404(models.User, **filter_params)
+        self.check_object_permissions(self.request, user)
         if self.request.method == 'POST':
-            models.Membership.objects.create(user=user, course=course)
-            return Response(status=status.HTTP_200_OK)
+            membership_data = {'user': user.pk, 'course': course.pk}
+            membership_serializer = serializers.MembershipSerializer(data=membership_data)
+            membership_serializer.is_valid(raise_exception=True)
+            membership_serializer.save()
+            return Response(membership_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            self.check_object_permissions(self.request, user)
             models.Membership.objects.filter(user=user, course=course).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
