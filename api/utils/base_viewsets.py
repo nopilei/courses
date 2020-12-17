@@ -50,7 +50,7 @@ class ParentModelViewSet(BaseModelViewSet):
             serializer = self.child_serializer_class(self.get_children(), many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            #  Populate 'user' field for child object
+            #  Populate foreign key for child object
             self.request.data.update({self.foreign_key_field_name: self.get_object().pk})
             serializer = self.child_serializer_class(data=self.request.data)
             serializer.is_valid(raise_exception=True)
