@@ -54,7 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Membership
-        fields = ['id', 'user', 'course']
+        fields = ['id', 'user', 'course', 'joined']
 
     def create(self, validated_data):
         try:
