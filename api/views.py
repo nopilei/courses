@@ -32,7 +32,7 @@ class CourseViewSet(base_viewsets.ParentModelViewSet, mixins.CreateModelMixin):
             permission_classes=[permissions.MoveUserPermission])
     def move_user(self, *args, **kwargs):
         """
-        Add new user to course or delete student
+        Add new user to course or remove student from course
         """
         course = get_object_or_404(self.get_queryset(), pk=self.kwargs[self.lookup_field])
         #  Ensure that we've got proper user data
