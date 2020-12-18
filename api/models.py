@@ -18,11 +18,11 @@ class User(AbstractUser):
 
     @property
     def is_student(self):
-        return self.STUDENT in self.role
+        return self.STUDENT == self.role
 
     @property
     def is_lecturer(self):
-        return self.LECTURER in self.role
+        return self.LECTURER == self.role
 
     class Meta:
         verbose_name = 'User'
